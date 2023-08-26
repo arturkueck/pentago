@@ -54,16 +54,16 @@ class Gamelogic:
         self.player = ["X", "Y"]
         self.turn = 0
         self.board = Board()
-        self.board.place(0, 0, "X")
-        self.board.place(1, 1, "X")
-        self.board.place(2, 2, "X")
-        self.board.place(4, 4, "X")
-        self.board.place(5, 3, "X")
-        self.board.place(5, 1, "Y")
-        self.board.place(5, 2, "Y")
-        self.board.place(5, 5, "Y")
-        self.board.place(4, 5, "Y")
-        self.board.place(3, 5, "Y")
+        self.board.place(0, 3, "X")
+        self.board.place(0, 4, "X")
+        self.board.place(0, 5, "X")
+        self.board.place(1, 5, "X")
+        self.board.place(2, 5, "X")
+        self.board.place(1, 0, "Y")
+        self.board.place(2, 1, "Y")
+        self.board.place(3, 0, "Y")
+        self.board.place(4, 3, "Y")
+        self.board.place(5, 4, "Y")
 
     def move(self, x, y, rblock, rotation):
         if self.board.place(x, y, self.player[self.turn]):
@@ -95,6 +95,53 @@ class Gamelogic:
                 else:
                     countcol = 0
 
+        d1 = 0
+        d2 = 0
+        for i in range(5):
+            if self.board.get_color(i, i) == self.board.get_color(i + 1, i + 1):
+                d1 += 1
+                if d1 == 4:
+                    winners[self.board.get_color(i, i)] += 1
+                    d1 = 0
+            else:
+                d1 = 0
+
+            if self.board.get_color(i, 5-i) == self.board.get_color(i + 1, 5-i - 1):
+                d2 += 1
+                if d2 == 4:
+                    winners[self.board.get_color(i, 5-i)] += 1
+                    d2 = 0
+            else:
+                d2 = 0
+
+        d1 = 0
+        d2 = 0
+        d3 = 0
+        d4 = 0
+        for i in range(4):
+            if self.board.get_color(i + 1, i) == self.board.get_color(i + 2, i + 1):
+                d1 += 1
+                if d1 == 4:
+                    winners[self.board.get_color(i + 1, i)] += 1
+                    d1 = 0
+
+            if self.board.get_color(i, i + 1) == self.board.get_color(i + 1, i + 2):
+                d2 += 1
+                if d2 == 4:
+                    winners[self.board.get_color(i, i + 1)] += 1
+                    d2 = 0
+
+            if self.board.get_color(i, 4 - i) == self.board.get_color(i + 1, 4 - (i + 1)):
+                d3 += 1
+                if d3 == 4:
+                    winners[self.board.get_color(i, 4 - i)] += 1
+                    d3 = 0
+
+            if self.board.get_color(i + 1, 5 - i) == self.board.get_color(i + 2, 5 - (i + 1)):
+                d4 += 1
+                if d4 == 4:
+                    winners[self.board.get_color(i + 1, 5 - i)] += 1
+                    d4 = 0
 
         if winners["X"] > winners["Y"]:
             return "X"
