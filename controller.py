@@ -1,3 +1,67 @@
+import tkinter as tk
+from tkinter import messagebox
+
+class GameViewGUI:
+    def __init__(self, gamelogic):
+        self.game = gamelogic
+        self.window = tk.Tk()
+        self.window.title("Game GUI")
+
+        self.create_board_buttons()
+        self.create_rotation_buttons()
+
+        self.run()
+
+    def create_board_buttons(self):
+        self.buttons = []
+        for i in range(6):
+            row_buttons = []
+            for j in range(6):
+                button = tk.Button(self.window, text=" ", width=5, height=2,
+                                   command=lambda i=i, j=j: self.handle_button_click(i, j))
+                button.grid(row=i, column=j, padx=2, pady=2)
+                row_buttons.append(button)
+            self.buttons.append(row_buttons)
+
+    def create_rotation_buttons(self):
+        rotation_frame = tk.Frame(self.window)
+        rotation_frame.grid(row=6, column=0, columnspan=6, pady=10)
+
+        for i in range(4):
+            rotate_button = tk.Button(rotation_frame, text=f"Rotate {i + 1}",
+                                      command=lambda i=i: self.handle_rotate_button_click(i))
+            rotate_button.grid(row=0, column=i, padx=5)
+    def handle_button_click(self, x, y):
+        self.game.move(x, y, 0, 0)
+        self.update_board()
+
+        if self.game.check_for_five():
+            self.end_game()
+
+    def handle_rotate_button_click(self, quadrant_index):
+        self.game.board.rotate(quadrant_index, 1)
+        self.update_board()
+
+    def update_board(self):
+        board = self.game.board
+        for i in range(6):
+            for j in range(6):
+                color = board.get_color(i, j)
+                self.buttons[i][j].config(text=color if color else "-")
+
+    def end_game(self):
+        winner = self.game.check_for_five()
+        if isinstance(winner, list):
+            result = "It's a draw!"
+        else:
+            result = f"Player {winner} wins!"
+        messagebox.showinfo("Game Over", result)
+        self.window.quit()
+
+    def run(self):
+        self.window.mainloop()
+
+
 class Board:
     def __init__(self):
         self.board = [[None] * 9, [None] * 9, [None] * 9, [None] * 9]
@@ -54,16 +118,6 @@ class Gamelogic:
         self.player = ["X", "Y"]
         self.turn = 0
         self.board = Board()
-        self.board.place(0, 3, "X")
-        self.board.place(0, 4, "X")
-        self.board.place(0, 5, "X")
-        self.board.place(1, 5, "X")
-        self.board.place(2, 5, "X")
-        self.board.place(1, 0, "Y")
-        self.board.place(2, 1, "Y")
-        self.board.place(3, 0, "Y")
-        self.board.place(4, 3, "Y")
-        self.board.place(5, 4, "Y")
 
     def move(self, x, y, rblock, rotation):
         if self.board.place(x, y, self.player[self.turn]):
@@ -167,5 +221,11 @@ class Gamelogic:
 
 
 
+# Create an instance of the Gamelogic class
 game = Gamelogic()
-game.run()
+
+# Create an instance of the GameViewGUI class with the Gamelogic instance
+view = GameViewGUI(game)
+
+# Run the game through the GUI
+view.run()
